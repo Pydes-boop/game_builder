@@ -1,11 +1,15 @@
 name: Build game for different platforms
 
-on: workflow_dispatch
+on: 
+  - workflow_dispatch
+  - push
   
 jobs:
-  check_for_new_commits:
+  check:
     name: Check for new commits in the last hour
     runs-on: ubuntu-latest
+    outputs:
+      continue: ${{ steps.evaluate.outputs.continue }}
     steps:
       - name: Checkout private repository
         uses: actions/checkout@v4
@@ -13,25 +17,22 @@ jobs:
           repository: Pydes-boop/Lumis_Constellations # Change title for other workflows
           token: ${{ secrets.ACCESS_TOKEN_LUMI }}
       - name: Get new commits
-        run: | # Change the time here according to your cron schedule
-          NEW_COMMIT_COUNT=$(git log --oneline --since '24 hours ago' | wc -l)
+        id: evaluate
+        run: | # Change the time here according to your cron schedule # || [ "${{ github.event_name }}" == 'workflow_dispatch' ]
+          NEW_COMMIT_COUNT=$(git log --oneline --since '2 hours ago' | wc -l)
           echo "New commit count: $NEW_COMMIT_COUNT"
-          if [ "$NEW_COMMIT_COUNT" -gt 0 ] || [ "${{ github.event_name }}" == 'workflow_dispatch' ]; then
-            CONTINUE=true
+          if [ "$NEW_COMMIT_COUNT" -gt 0 ]; then
+            echo "continue=true" >> $GITHUB_OUTPUT
           else
-            CONTINUE=false
+            echo "continue=false" >> $GITHUB_OUTPUT
           fi
-          echo "::set-output name=continue::$CONTINUE"
-          echo "Continue? $CONTINUE"
-    outputs:
-      continue: ${{ steps.check_for_new_commits.outputs.continue }}
 
   build:
     name: Building for ${{ matrix.targetPlatform }}
     runs-on: ubuntu-latest
     needs: 
-      - check_for_new_commits
-    if: ${{ needs.check_for_new_commits.outputs.continue == 'true' }}
+      - check
+    if: needs.check.outputs.continue == 'true'
     strategy:
       fail-fast: false
       matrix:
