@@ -1,9 +1,10 @@
-name: Build game for different platforms
+name: Nightly build for Lumis Constellations for different platforms
 
 on: 
-  - workflow_dispatch
-  - push
-  
+  workflow_dispatch:
+  schedule:
+    - cron: '0 5 * * *'
+
 jobs:
   check:
     name: Check for new commits in the last hour
@@ -19,7 +20,7 @@ jobs:
       - name: Get new commits
         id: evaluate
         run: | # Change the time here according to your cron schedule # 
-          NEW_COMMIT_COUNT=$(git log --oneline --since '1 hours ago' | wc -l)
+          NEW_COMMIT_COUNT=$(git log --oneline --since '24 hours ago' | wc -l)
           echo "New commit count: $NEW_COMMIT_COUNT"
           if [ "$NEW_COMMIT_COUNT" -gt 0 ] || [ "${{ github.event_name }}" == 'workflow_dispatch' ]; then
             echo "continue=true" >> $GITHUB_OUTPUT
@@ -37,10 +38,10 @@ jobs:
       fail-fast: false
       matrix:
         targetPlatform: # see https://docs.unity3d.com/ScriptReference/BuildTarget.html
+          - StandaloneWindows
           - StandaloneWindows64
           - StandaloneLinux64
           - StandaloneOSX
-          # - StandaloneWindows
           # - WebGL
     steps:
       - name: Checkout private repository
@@ -84,10 +85,10 @@ jobs:
       fail-fast: false
       matrix:
         targetPlatform:
+          - StandaloneWindows
           - StandaloneWindows64
           - StandaloneLinux64
           - StandaloneOSX
-          # - StandaloneWindows
           # - WebGL
     steps:
       - name: Download artifact
@@ -100,7 +101,7 @@ jobs:
         uses: manleydev/butler-publish-itchio-action@master
         env:
           BUTLER_CREDENTIALS: ${{ secrets.ITCH_API_KEY }}
-          CHANNEL: Lumi_${{ matrix.targetPlatform }} # see https://itch.io/docs/butler/pushing.html # Change title for other workflows
+          CHANNEL: ${{ matrix.targetPlatform }} # see https://itch.io/docs/butler/pushing.html # Change title for other workflows
           ITCH_GAME: ${{ vars.ITCH_GAME }}
           ITCH_USER: ${{ secrets.ITCH_USER }}
           VERSION: ${{ vars.LUMI_VERSION }}.${{ github.run_number }}
