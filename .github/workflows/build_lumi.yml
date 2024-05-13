@@ -1,0 +1,93 @@
+name: Build game for different platforms
+
+on: workflow_dispatch
+  
+jobs:
+  build:
+    name: Building for ${{ matrix.targetPlatform }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        targetPlatform: # see https://docs.unity3d.com/ScriptReference/BuildTarget.html
+          - StandaloneWindows64
+          - StandaloneLinux64
+          - StandaloneOSX
+          # - StandaloneWindows
+          # - WebGL
+    steps:
+      - name: Checkout private repository
+        uses: actions/checkout@v4
+        with:
+          repository: Pydes-boop/Lumis_Constellations # Change title for other workflows
+          token: ${{ secrets.ACCESS_TOKEN_LUMI }}
+
+      - name: Check for new commits in the last hour
+        run: echo "NEW_COMMIT_COUNT=$(git log --oneline --since '1 hours ago' | wc -l)" >> $GITHUB_ENV
+
+      - name: Cache files for faster build
+        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}
+          restore-keys: Library-
+
+      - name: Build project with unity
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: ${{ matrix.targetPlatform }}
+          unityVersion: auto
+          projectPath: .
+          versioning: Semantic
+          buildName: Lumis_Constellations # Change title for other workflows
+          
+      - name: Upload build results as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lumis_Constellations-${{ matrix.targetPlatform }} # Change title for other workflows
+          path: build/${{ matrix.targetPlatform }}
+
+    publish:
+    name: Uploading to itch.io for ${{ matrix.targetPlatform }}
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        targetPlatform:
+          - StandaloneWindows64
+          - StandaloneLinux64
+          - StandaloneOSX
+          # - StandaloneWindows
+          # - WebGL
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Lumis_Constellations-${{ matrix.targetPlatform }} # Change title for other workflows
+          path: build/${{ matrix.targetPlatform }}
+
+      - name: Publish to itch.io
+        uses: manleydev/butler-publish-itchio-action@master
+        env:
+          BUTLER_CREDENTIALS: ${{ secrets.ITCH_API_KEY }}
+          CHANNEL: ${{ matrix.targetPlatform }} # see https://itch.io/docs/butler/pushing.html
+          ITCH_GAME: ${{ env.LUMI_ITCH_TITLE }}
+          ITCH_USER: ${{ secrets.ITCH_USER }}
+          VERSION: ${{ env.LUMI_VERSION }}.${{ github.run_number }}
+          PACKAGE: build/${{ matrix.targetPlatform }}
+
+    cleanup:
+    name: Deleting uploaded artifacts
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete published artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+            name: Lumis_Constellations-* # Change title for other workflows
