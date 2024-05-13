@@ -1,0 +1,75 @@
+name: Build game for different platforms
+
+on: workflow_dispatch
+
+
+env:
+  REPO_NAME: repository
+
+  
+jobs:
+  build-Windows:
+    name: Building $NAME for ${{ matrix.targetPlatform }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        targetPlatform:
+          - StandaloneWindows
+          - StandaloneWindows64
+          - StandaloneLinux64
+          - StandaloneOSX
+          - WebGL
+    steps:
+      # Checkout Repository to be built
+      - name: Checkout private repository # TODO work and improve this
+        uses: actions/checkout@v4
+        with:
+          repository: organization_name/$REPO_NAME
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      # Cache files for faster build
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}
+          restore-keys: Library-
+
+      # Build Project with unity
+      - name: Build project
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: ${{ matrix.targetPlatform }}
+          unityVersion: auto
+          projectPath: .
+          versioning: Semantic
+          buildName: $NAME
+
+      # Upload Build as Artifact
+      - name: Upload build results
+        uses: actions/upload-artifact@v4
+        with:
+          name: $NAME-${{ matrix.targetPlatform }}
+          path: build/${{ matrix.targetPlatform }}
+          
+       # Set variables for version tagging # use run number somehow ? ${{github.run_number}}
+      - name: Set release date
+        run: echo "RELEASE_DATE=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
+      - name: Set short hash
+        run: echo "SHORT_HASH=$(git rev-parse --short HEAD)" >> ${GITHUB_ENV}
+
+      # Deploy
+      - name: Upload build to itch.io
+        uses: robpc/itchio-upload-action@v1
+        with:
+          path: build
+          project: ${{ secrets.ITCH_PROJECT }}
+          channel: webgl
+          api-key: ${{ secrets.ITCH_API_KEY }}
+          version: ${{ env.RELEASE_DATE }}-${{ env.SHORT_HASH }}
