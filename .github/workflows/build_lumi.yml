@@ -3,9 +3,35 @@ name: Build game for different platforms
 on: workflow_dispatch
   
 jobs:
+  check_for_new_commits:
+    name: Check for new commits in the last hour
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout private repository
+        uses: actions/checkout@v4
+        with:
+          repository: Pydes-boop/Lumis_Constellations # Change title for other workflows
+          token: ${{ secrets.ACCESS_TOKEN_LUMI }}
+      - name: Get new commits
+        run: | # Change the time here according to your cron schedule
+          NEW_COMMIT_COUNT=$(git log --oneline --since '24 hours ago' | wc -l)
+          echo "New commit count: $NEW_COMMIT_COUNT"
+          if [ "$NEW_COMMIT_COUNT" -gt 0 ] || [ "${{ github.event_name }}" == 'workflow_dispatch' ]; then
+            CONTINUE=true
+          else
+            CONTINUE=false
+          fi
+          echo "::set-output name=continue::$CONTINUE"
+          echo "Continue? $CONTINUE"
+    outputs:
+      continue: ${{ steps.check_for_new_commits.outputs.continue }}
+
   build:
     name: Building for ${{ matrix.targetPlatform }}
     runs-on: ubuntu-latest
+    needs: 
+      - check_for_new_commits
+    if: ${{ needs.check_for_new_commits.outputs.continue == 'true' }}
     strategy:
       fail-fast: false
       matrix:
@@ -22,11 +48,7 @@ jobs:
           repository: Pydes-boop/Lumis_Constellations # Change title for other workflows
           token: ${{ secrets.ACCESS_TOKEN_LUMI }}
 
-      - name: Check for new commits in the last hour
-        run: echo "NEW_COMMIT_COUNT=$(git log --oneline --since '1 hours ago' | wc -l)" >> $GITHUB_ENV
-
       - name: Cache files for faster build
-        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
         uses: actions/cache@v4
         with:
           path: Library
@@ -54,7 +76,8 @@ jobs:
 
   publish:
     name: Uploading to itch.io for ${{ matrix.targetPlatform }}
-    needs: build
+    needs: 
+      - build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -84,7 +107,8 @@ jobs:
 
   cleanup:
     name: Deleting uploaded artifacts
-    needs: publish
+    needs: 
+      - publish
     runs-on: ubuntu-latest
     steps:
       - name: Delete published artifacts
