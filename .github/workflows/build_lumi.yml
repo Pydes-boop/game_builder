@@ -52,7 +52,7 @@ jobs:
           name: Lumis_Constellations-${{ matrix.targetPlatform }} # Change title for other workflows
           path: build/${{ matrix.targetPlatform }}
 
-    publish:
+  publish:
     name: Uploading to itch.io for ${{ matrix.targetPlatform }}
     needs: build
     runs-on: ubuntu-latest
@@ -82,7 +82,7 @@ jobs:
           VERSION: ${{ env.LUMI_VERSION }}.${{ github.run_number }}
           PACKAGE: build/${{ matrix.targetPlatform }}
 
-    cleanup:
+  cleanup:
     name: Deleting uploaded artifacts
     needs: publish
     runs-on: ubuntu-latest
