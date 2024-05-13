@@ -18,10 +18,10 @@ jobs:
           token: ${{ secrets.ACCESS_TOKEN_LUMI }}
       - name: Get new commits
         id: evaluate
-        run: | # Change the time here according to your cron schedule # || [ "${{ github.event_name }}" == 'workflow_dispatch' ]
-          NEW_COMMIT_COUNT=$(git log --oneline --since '2 hours ago' | wc -l)
+        run: | # Change the time here according to your cron schedule # 
+          NEW_COMMIT_COUNT=$(git log --oneline --since '1 hours ago' | wc -l)
           echo "New commit count: $NEW_COMMIT_COUNT"
-          if [ "$NEW_COMMIT_COUNT" -gt 0 ]; then
+          if [ "$NEW_COMMIT_COUNT" -gt 0 ] || [ "${{ github.event_name }}" == 'workflow_dispatch' ]; then
             echo "continue=true" >> $GITHUB_OUTPUT
           else
             echo "continue=false" >> $GITHUB_OUTPUT
@@ -100,10 +100,10 @@ jobs:
         uses: manleydev/butler-publish-itchio-action@master
         env:
           BUTLER_CREDENTIALS: ${{ secrets.ITCH_API_KEY }}
-          CHANNEL: ${{ matrix.targetPlatform }} # see https://itch.io/docs/butler/pushing.html
-          ITCH_GAME: ${{ env.LUMI_ITCH_TITLE }}
+          CHANNEL: Lumi_${{ matrix.targetPlatform }} # see https://itch.io/docs/butler/pushing.html # Change title for other workflows
+          ITCH_GAME: ${{ vars.ITCH_GAME }}
           ITCH_USER: ${{ secrets.ITCH_USER }}
-          VERSION: ${{ env.LUMI_VERSION }}.${{ github.run_number }}
+          VERSION: ${{ vars.LUMI_VERSION }}.${{ github.run_number }}
           PACKAGE: build/${{ matrix.targetPlatform }}
 
   cleanup:
