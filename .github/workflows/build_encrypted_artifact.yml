@@ -43,6 +43,19 @@ jobs:
         with:
           path: ./extern
 
+      - name: test
+        run: |
+          - ls
+          - cd build
+          - ls
+          - cd ..
+          - cd extern
+          - ls
+          - cd scripts
+          - ls
+          - cd ../../build/
+          - ls
+
       - name: Encrypt build
         run: ./extern/scripts/encrypt_folder_script.sh
         env:
