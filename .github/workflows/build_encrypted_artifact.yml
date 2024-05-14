@@ -41,17 +41,13 @@ jobs:
 
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: ./scripts/encrypt_folder_script.sh
-          sparse-checkout-cone-mode: false
+          path: ./extern
 
       - name: Encrypt build
-        run: ./encrypt_folder_script.sh
+        run: ./extern/scripts/encrypt_folder_script.sh
         env:
           ARTIFACTS_PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
-          FOLDER: ./build/${{ matrix.targetPlatform }}
-
-      - name: List files and directories in repository recursively
-        run: ls
+          FOLDER: ../../build/${{ matrix.targetPlatform }}
           
       - name: Upload build results as artifact
         uses: actions/upload-artifact@v4
