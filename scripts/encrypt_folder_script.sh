@@ -11,7 +11,7 @@ else
 fi
 
 # Encrypt the zip file symmetrically using GPG
-gpg --quiet --batch --yes --symmetric --cipher-algo AES256 --passphrase=$PASSPHRASE --output $FOLDER.zip.enc $FOLDER.zip
+gpg --quiet --batch --yes --symmetric --cipher-algo AES256 --passphrase="$PASSPHRASE" --output "$FOLDER.zip.enc" "$FOLDER.zip"
 
 # Remove the temporary zip file
 rm "$FOLDER.zip"
