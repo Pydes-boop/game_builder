@@ -1,6 +1,7 @@
 name: Build and Upload as encrypted artifact
 
 on: 
+  push:
   workflow_dispatch:
 
 jobs:
@@ -43,9 +44,9 @@ jobs:
         run: |
           ls
           cd build
-          zip -r ${{ matrix.targetPlatform }}.zip ${{ matrix.targetPlatform }}
-          gpg --quiet --batch --yes --symmetric --cipher-algo AES256 --passphrase=${{ secrets.ARTIFACTS_PASSPHRASE }} --output ${{ matrix.targetPlatform }}.zip.enc ${{ matrix.targetPlatform }}.zip
-          rm "$FOLDER.zip"
+          zip -r "${{ matrix.targetPlatform }}.zip" "${{ matrix.targetPlatform }}""
+          gpg --quiet --batch --yes --symmetric --cipher-algo AES256 --passphrase="${{ secrets.ARTIFACTS_PASSPHRASE }}"" --output "${{ matrix.targetPlatform }}.zip.enc" "${{ matrix.targetPlatform }}.zip"
+          rm "${{ matrix.targetPlatform }}.zip"
           
       - name: Upload build results as artifact
         uses: actions/upload-artifact@v4
