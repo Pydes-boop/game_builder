@@ -18,16 +18,14 @@ jobs:
         with:
           repository: Pydes-boop/Lumis_Constellations # Change title for other workflows
           token: ${{ secrets.ACCESS_TOKEN_LUMI }}
-
-      - name: List files in directory
-        run: ls
+          path: repository
 
       - name: Cache files for faster build
         uses: actions/cache@v4
         with:
-          path: Library
-          key: Library-${{ matrix.targetPlatform }}
-          restore-keys: Library-
+          path: repository/Library
+          key: repository/Library-${{ matrix.targetPlatform }}
+          restore-keys: repository/Library-
 
       - name: Build project with unity
         uses: game-ci/unity-builder@v4
@@ -38,26 +36,20 @@ jobs:
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
           unityVersion: auto
-          projectPath: .
+          projectPath: .repository/
           versioning: Semantic
           buildName: Lumis_Constellations # Change title for other workflows
       
-      - name: List files in directory
-        run: ls
-      
       - uses: actions/checkout@v4
-
-      - name: List files in directory
-        run: ls
-
-      # - name: Encrypt build
-      #   run: ./scripts/encrypt_folder_script.sh
-      #   env:
-      #     ARTIFACTS_PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
-      #     FOLDER: build/${{ matrix.targetPlatform }}
+      
+      - name: Encrypt build
+        run: ./scripts/encrypt_folder_script.sh
+        env:
+          ARTIFACTS_PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
+          FOLDER: .repository/build/${{ matrix.targetPlatform }}
           
-      # - name: Upload build results as artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: Lumis_Constellations-${{ matrix.targetPlatform }} # Change title for other workflows
-      #     path: build/${{ matrix.targetPlatform }}.zip.enc
+      - name: Upload build results as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lumis_Constellations-${{ matrix.targetPlatform }} # Change title for other workflows
+          path: build/${{ matrix.targetPlatform }}.zip.enc
