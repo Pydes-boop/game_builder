@@ -1,0 +1,63 @@
+name: Build and Upload as encrypted artifact
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Building for ${{ matrix.targetPlatform }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        targetPlatform:
+          - StandaloneWindows64
+    steps:
+      - name: Checkout private repository
+        uses: actions/checkout@v4
+        with:
+          repository: Pydes-boop/Lumis_Constellations # Change title for other workflows
+          token: ${{ secrets.ACCESS_TOKEN_LUMI }}
+
+      - name: List files in directory
+        run: ls
+
+      - name: Cache files for faster build
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}
+          restore-keys: Library-
+
+      - name: Build project with unity
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: ${{ matrix.targetPlatform }}
+          unityVersion: auto
+          projectPath: .
+          versioning: Semantic
+          buildName: Lumis_Constellations # Change title for other workflows
+      
+      - name: List files in directory
+        run: ls
+      
+      - uses: actions/checkout@v4
+
+      - name: List files in directory
+        run: ls
+
+      # - name: Encrypt build
+      #   run: ./scripts/encrypt_folder_script.sh
+      #   env:
+      #     ARTIFACTS_PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
+      #     FOLDER: build/${{ matrix.targetPlatform }}
+          
+      # - name: Upload build results as artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: Lumis_Constellations-${{ matrix.targetPlatform }} # Change title for other workflows
+      #     path: build/${{ matrix.targetPlatform }}.zip.enc
