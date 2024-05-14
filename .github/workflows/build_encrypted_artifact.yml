@@ -13,26 +13,18 @@ jobs:
         targetPlatform:
           - StandaloneWindows64
     steps:
-      - name: List files and directories in repository recursively
-        run: find . -type f -o -type d
-
       - name: Checkout private repository
         uses: actions/checkout@v4
         with:
           repository: Pydes-boop/Lumis_Constellations # Change title for other workflows
           token: ${{ secrets.ACCESS_TOKEN_LUMI }}
-          path: private_repo
-
-      - name: List files and directories in repository recursively
-        run: find . -type f -o -type d
-
 
       - name: Cache files for faster build
         uses: actions/cache@v4
         with:
-          path: reposprivate_repoitory/Library
-          key: private_repo/Library-${{ matrix.targetPlatform }}
-          restore-keys: private_repo/Library-
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}
+          restore-keys: Library-
 
       - name: Build project with unity
         uses: game-ci/unity-builder@v4
@@ -43,29 +35,28 @@ jobs:
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
           unityVersion: auto
-          projectPath: .private_repo/
+          projectPath: .
           versioning: Semantic
           buildName: Lumis_Constellations # Change title for other workflows
 
-      - name: List files and directories in repository recursively
-        run: find . -type f -o -type d
-      
       - uses: actions/checkout@v4
+        with:
+          path: ./extern
 
       - name: List files and directories in repository recursively
-        run: find . -type f -o -type d
+        run: ls
 
       - name: Encrypt build
-        run: ./scripts/encrypt_folder_script.sh
+        run: ./extern/scripts/encrypt_folder_script.sh
         env:
           ARTIFACTS_PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
-          FOLDER: .private_repo/build/${{ matrix.targetPlatform }}
+          FOLDER: ./build/${{ matrix.targetPlatform }}
 
       - name: List files and directories in repository recursively
-        run: find . -type f -o -type d
+        run: ls
           
       - name: Upload build results as artifact
         uses: actions/upload-artifact@v4
         with:
           name: Lumis_Constellations-${{ matrix.targetPlatform }} # Change title for other workflows
-          path: .private_repo/build/${{ matrix.targetPlatform }}.zip.enc
+          path: ./build/${{ matrix.targetPlatform }}.zip.enc
