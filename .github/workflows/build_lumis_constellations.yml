@@ -3,7 +3,7 @@ name: Nightly build for Lumis Constellations for different platforms
 on: 
   workflow_dispatch:
   schedule:
-    - cron: '0 5 * * *'
+    - cron: '0 3 * * *'
 
 jobs:
   check:
