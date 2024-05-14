@@ -38,29 +38,14 @@ jobs:
           projectPath: .
           versioning: Semantic
           buildName: Lumis_Constellations # Change title for other workflows
-
-      - uses: actions/checkout@v4
-        with:
-          path: ./extern
-
-      - name: test
-        run: |
-          - ls
-          - cd build
-          - ls
-          - cd ..
-          - cd extern
-          - ls
-          - cd scripts
-          - ls
-          - cd ../../build/
-          - ls
-
+      
       - name: Encrypt build
-        run: ./extern/scripts/encrypt_folder_script.sh
-        env:
-          ARTIFACTS_PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
-          FOLDER: ../../build/${{ matrix.targetPlatform }}
+        run: |
+          ls
+          cd build
+          zip -r ${{ matrix.targetPlatform }}.zip ${{ matrix.targetPlatform }}
+          gpg --quiet --batch --yes --symmetric --cipher-algo AES256 --passphrase=${{ secrets.ARTIFACTS_PASSPHRASE }} --output ${{ matrix.targetPlatform }}.zip.enc ${{ matrix.targetPlatform }}.zip
+          rm "$FOLDER.zip"
           
       - name: Upload build results as artifact
         uses: actions/upload-artifact@v4
