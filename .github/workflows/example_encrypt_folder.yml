@@ -2,7 +2,6 @@ name: Generating, Zipping and Encrypting a folder/file
 
 on: 
   workflow_dispatch:
-  push:
 
 jobs:
   build:
@@ -49,4 +48,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: testing_file
-          path: test.zip.enc
+          path: test/test2.zip.enc
