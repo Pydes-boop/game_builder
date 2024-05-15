@@ -19,9 +19,6 @@ jobs:
           ls
           cd ..
           ls
-          cd scripts
-          ls
-          cd ..
 
       - name: Checkout zip script
         uses: actions/checkout@v4
