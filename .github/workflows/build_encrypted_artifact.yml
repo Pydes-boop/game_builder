@@ -50,7 +50,7 @@ jobs:
       - name: Zip folder
         run: ./extern/scripts/zip.sh
         env:
-          FOLDER: ./Lumis_Constellations/build
+          FOLDER: Lumis_Constellations/build
 
       - name: Encrypt build
         run: ./extern/scripts/encrypt.sh
