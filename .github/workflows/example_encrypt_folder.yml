@@ -11,13 +11,6 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-      - name: Checkout zip script
-        uses: actions/checkout@v4
-        with:
-          path: ./scripts
-          sparse-checkout: scripts
-          sparse-checkout-cone-mode: false
-      
       - name: Create folder
         run: |
           mkdir test
@@ -25,6 +18,20 @@ jobs:
           touch testingfile
           ls
           cd ..
+          ls
+          cd scripts
+          ls
+          cd ..
+
+      - name: Checkout zip script
+        uses: actions/checkout@v4
+        with:
+          path: .
+          sparse-checkout: scripts
+          sparse-checkout-cone-mode: false
+      
+      - name: Create folder
+        run: |
           ls
           cd scripts
           ls
