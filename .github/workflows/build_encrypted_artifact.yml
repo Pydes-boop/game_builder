@@ -50,13 +50,13 @@ jobs:
       - name: Zip folder
         run: ./extern/scripts/zip.sh
         env:
-          FOLDER: Lumis_Constellations/build
+          FOLDER: build
 
       - name: Encrypt build
         run: ./extern/scripts/encrypt.sh
         env:
           PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
-          FILE: ./Lumis_Constellations/build.zip
+          FILE: ./build.zip
 
       - name: Overview
         run: |
@@ -79,4 +79,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Lumis_Constellations-${{ matrix.targetPlatform }} # Change title for other workflows
-          path: ./Lumis_Constellations/Build.zip.enc
+          path: ./build.zip.enc
