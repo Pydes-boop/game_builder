@@ -23,7 +23,7 @@ jobs:
       - name: Checkout zip script
         uses: actions/checkout@v4
         with:
-          path: .
+          path: ./scripts
           sparse-checkout: scripts
           sparse-checkout-cone-mode: false
       
@@ -35,12 +35,12 @@ jobs:
           cd ..
 
       - name: Zip folder
-        run: ./scripts/zip.sh
+        run: ./scripts/scripts/zip.sh
         env:
           FOLDER: test
 
       - name: Encrypt build
-        run: ./scripts/encrypt.sh
+        run: ./scripts/scripts/encrypt.sh
         env:
           PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
           FILE: ./test.zip
