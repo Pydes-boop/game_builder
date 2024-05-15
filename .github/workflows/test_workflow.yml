@@ -31,7 +31,7 @@ jobs:
       - name: Encrypt build
         run: ./scripts/encrypt.sh
         env:
-          ARTIFACTS_PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
+          PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
           FILE: ./test.zip
 
       - name: Overview
