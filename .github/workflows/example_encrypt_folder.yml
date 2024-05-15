@@ -2,6 +2,7 @@ name: Generating, Zipping and Encrypting a folder/file
 
 on: 
   workflow_dispatch:
+  push:
 
 jobs:
   build:
@@ -14,10 +15,13 @@ jobs:
         run: |
           mkdir test
           cd test
+          mkdir test2
+          cd test2
           touch testingfile
           ls
           cd ..
           ls
+          cd ..
 
       - name: Checkout scripts
         uses: actions/checkout@v4
@@ -29,13 +33,13 @@ jobs:
       - name: Zip folder
         run: ./extern/scripts/zip.sh
         env:
-          FOLDER: test
+          FOLDER: test/test2
 
       - name: Encrypt build
         run: ./extern/scripts/encrypt.sh
         env:
           PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
-          FILE: ./test.zip
+          FILE: ./test/test2.zip
 
       - name: Overview
         run: |

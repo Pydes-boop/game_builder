@@ -61,11 +61,15 @@ jobs:
       - name: Overview
         run: |
           ls
+          echo "--- cd ---"
           cd Lumis_Constellations
           ls
+          echo "--- cd ---"
           cd ..
+          echo "--- cd ---"
           cd extern
           ls
+          echo "--- cd ---"
           cd scripts
           ls
           cd ..
