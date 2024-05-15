@@ -1,4 +1,4 @@
-name: Build and Upload as encrypted artifact
+name: Testing around with encryption and bash scripts
 
 on: 
   push:
