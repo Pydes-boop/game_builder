@@ -2,6 +2,7 @@ name: Generating, Zipping and Encrypting a folder/file
 
 on: 
   workflow_dispatch:
+  push:
 
 jobs:
   build:
@@ -25,6 +26,9 @@ jobs:
           ls
           cd ..
           ls
+          cd scripts
+          ls
+          cd ..
 
       - name: Zip folder
         run: ./scripts/zip.sh
