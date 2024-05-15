@@ -23,7 +23,7 @@ jobs:
       - name: Cache files for faster build
         uses: actions/cache@v4
         with:
-          path: Library
+          path: Lumis_Constellations/Library
           key: Library-${{ matrix.targetPlatform }}
           restore-keys: Library-
 
