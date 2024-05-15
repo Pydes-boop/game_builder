@@ -1,0 +1,45 @@
+name: Build and Upload as encrypted artifact
+
+on: 
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Testing zipping and encryption
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout private repository
+        uses: actions/checkout@v4
+      
+      - name: Create folder
+        run: |
+          mkdir test
+          cd test
+          touch testingfile
+          ls
+          cd ..
+          ls
+
+      - name: Zip folder
+        run: ./scripts/zip.sh
+        env:
+          FOLDER: test
+
+      - name: Encrypt build
+        run: ./scripts/encrypt.sh
+        env:
+          ARTIFACTS_PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
+          FOLDER: test.zip
+
+      - name: Overview
+        run: |
+          ls
+          
+      - name: Upload build results as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: testing_file
+          path: test.zip.enc

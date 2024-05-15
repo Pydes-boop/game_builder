@@ -1,0 +1,1 @@
+These scripts do not fulfill security goals. Do not use them. They are purely for playing around.
