@@ -50,13 +50,13 @@ jobs:
       - name: Zip folder
         run: ./extern/scripts/zip.sh
         env:
-          FOLDER: ./Lumis_Constellations/Build
+          FOLDER: ./Lumis_Constellations/build
 
       - name: Encrypt build
         run: ./extern/scripts/encrypt.sh
         env:
           PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
-          FILE: ./Lumis_Constellations/Build.zip
+          FILE: ./Lumis_Constellations/build.zip
 
       - name: Overview
         run: |
