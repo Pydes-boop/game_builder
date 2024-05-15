@@ -13,15 +13,8 @@ jobs:
       - name: Checkout zip script
         uses: actions/checkout@v4
         with:
-          path: .
-          sparse-checkout: scripts/zip.sh
-          sparse-checkout-cone-mode: false
-
-      - name: Checkout encrypt script
-        uses: actions/checkout@v4
-        with:
-          path: .
-          sparse-checkout: scripts/encrypt.sh
+          path: ./scripts
+          sparse-checkout: scripts
           sparse-checkout-cone-mode: false
       
       - name: Create folder
