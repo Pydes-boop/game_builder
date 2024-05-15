@@ -16,8 +16,16 @@ jobs:
       - name: Checkout private repository
         uses: actions/checkout@v4
         with:
+          path: Lumis_Constellations
           repository: Pydes-boop/Lumis_Constellations # Change title for other workflows
           token: ${{ secrets.ACCESS_TOKEN_LUMI }}
+
+      - name: Get overview
+        run: |
+          ls
+          cd Lumis_Constellations
+          ls
+          cd ..
 
       - name: Cache files for faster build
         uses: actions/cache@v4
@@ -35,9 +43,23 @@ jobs:
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
           unityVersion: auto
-          projectPath: .
+          projectPath: ./Lumis_Constellations/
           versioning: Semantic
           buildName: Lumis_Constellations # Change title for other workflows
+
+      - name: Get overview
+        run: |
+          ls
+          cd Lumis_Constellations
+          ls
+          cd ..
+
+      - name: Checkout Zip script
+        uses: actions/checkout@v4
+        with:
+          path: .
+          sparse-checkout: scripts/zip.sh
+          sparse-checkout-cone-mode: false
       
       - name: Encrypt build
         run: |

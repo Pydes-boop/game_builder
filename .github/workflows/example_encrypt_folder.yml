@@ -1,7 +1,6 @@
-name: Testing around with encryption and bash scripts
+name: Generating, Zipping and Encrypting a folder/file
 
 on: 
-  push:
   workflow_dispatch:
 
 jobs:
@@ -11,8 +10,19 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-      - name: Checkout private repository
+      - name: Checkout zip script
         uses: actions/checkout@v4
+        with:
+          path: .
+          sparse-checkout: scripts/zip.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Checkout encrypt script
+        uses: actions/checkout@v4
+        with:
+          path: .
+          sparse-checkout: scripts/encrypt.sh
+          sparse-checkout-cone-mode: false
       
       - name: Create folder
         run: |
