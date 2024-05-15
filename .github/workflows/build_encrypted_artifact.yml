@@ -1,7 +1,6 @@
 name: Build and Upload as encrypted artifact
 
 on: 
-  push:
   workflow_dispatch:
 
 jobs:
