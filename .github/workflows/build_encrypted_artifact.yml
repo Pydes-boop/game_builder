@@ -20,13 +20,6 @@ jobs:
           repository: Pydes-boop/Lumis_Constellations # Change title for other workflows
           token: ${{ secrets.ACCESS_TOKEN_LUMI }}
 
-      - name: Get overview
-        run: |
-          ls
-          cd Lumis_Constellations
-          ls
-          cd ..
-
       - name: Cache files for faster build
         uses: actions/cache@v4
         with:
@@ -47,30 +40,39 @@ jobs:
           versioning: Semantic
           buildName: Lumis_Constellations # Change title for other workflows
 
-      - name: Get overview
+      - name: Checkout scripts
+        uses: actions/checkout@v4
+        with:
+          path: ./extern
+          sparse-checkout: scripts
+          sparse-checkout-cone-mode: false
+
+      - name: Zip folder
+        run: ./extern/scripts/zip.sh
+        env:
+          FOLDER: ./Lumis_Constellations/Build
+
+      - name: Encrypt build
+        run: ./extern/scripts/encrypt.sh
+        env:
+          PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
+          FILE: ./Lumis_Constellations/Build.zip
+
+      - name: Overview
         run: |
           ls
           cd Lumis_Constellations
           ls
           cd ..
-
-      - name: Checkout Zip script
-        uses: actions/checkout@v4
-        with:
-          path: .
-          sparse-checkout: scripts/zip.sh
-          sparse-checkout-cone-mode: false
-      
-      - name: Encrypt build
-        run: |
+          cd extern
           ls
-          cd build
-          zip -r "${{ matrix.targetPlatform }}.zip" "${{ matrix.targetPlatform }}""
-          gpg --quiet --batch --yes --symmetric --cipher-algo AES256 --passphrase="${{ secrets.ARTIFACTS_PASSPHRASE }}"" --output "${{ matrix.targetPlatform }}.zip.enc" "${{ matrix.targetPlatform }}.zip"
-          rm "${{ matrix.targetPlatform }}.zip"
+          cd scripts
+          ls
+          cd ..
+          cd ..
           
       - name: Upload build results as artifact
         uses: actions/upload-artifact@v4
         with:
           name: Lumis_Constellations-${{ matrix.targetPlatform }} # Change title for other workflows
-          path: ./build/${{ matrix.targetPlatform }}.zip.enc
+          path: ./Lumis_Constellations/Build.zip.enc
