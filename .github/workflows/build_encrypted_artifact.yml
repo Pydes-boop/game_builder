@@ -57,23 +57,6 @@ jobs:
         env:
           PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
           FILE: ./build.zip
-
-      - name: Overview
-        run: |
-          ls
-          echo "--- cd ---"
-          cd Lumis_Constellations
-          ls
-          echo "--- cd ---"
-          cd ..
-          echo "--- cd ---"
-          cd extern
-          ls
-          echo "--- cd ---"
-          cd scripts
-          ls
-          cd ..
-          cd ..
           
       - name: Upload build results as artifact
         uses: actions/upload-artifact@v4
