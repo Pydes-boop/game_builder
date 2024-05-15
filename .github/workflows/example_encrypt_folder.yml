@@ -20,27 +20,20 @@ jobs:
           cd ..
           ls
 
-      - name: Checkout encrypt script
+      - name: Checkout scripts
         uses: actions/checkout@v4
         with:
-          path: ./scripts
-          sparse-checkout: scripts/encrypt.sh
-          sparse-checkout-cone-mode: false
-
-      - name: Checkout zip script
-        uses: actions/checkout@v4
-        with:
-          path: ./scripts
-          sparse-checkout: scripts/zip.sh
+          path: ./extern
+          sparse-checkout: scripts
           sparse-checkout-cone-mode: false
 
       - name: Zip folder
-        run: ./scripts/zip.sh
+        run: ./extern/scripts/zip.sh
         env:
           FOLDER: test
 
       - name: Encrypt build
-        run: ./scripts/encrypt.sh
+        run: ./extern/scripts/encrypt.sh
         env:
           PASSPHRASE: ${{ secrets.ARTIFACTS_PASSPHRASE }}
           FILE: ./test.zip
